@@ -7,7 +7,7 @@ var casper = require('casper').create({
 });
 
 
-var topicName, postContent, topicId, messageId, content, topic, title;
+var topicName, postContent, topicId, messageId, content, tpc, title;
 var postIdArray = [];
 var postIdArray2 = [];
 
@@ -49,10 +49,10 @@ function getContent(){
 	return this.content;
 }
 function getTopic(){
-	return this.topic;
+	return this.tpc;
 }
-function setTopic(topic){
-	this.topic = topic;
+function setTopic(tpc){
+	this.tpc = tpc;
 }
 function setTitle(title){
 	this.title = title;
@@ -387,6 +387,8 @@ var topic = function(idTopic){
 				});
 				casper.then(function(){
 					setLastPost2(getMessageIdValue());
+					var posts = getPostIdArray();
+					setLastPost1(posts[posts.length-1]);
 				});
 				casper.then(function(){
 					this.echo("Wait 30s");
@@ -413,6 +415,8 @@ var topic = function(idTopic){
 				});
 				casper.then(function(){
 					setLastPost1(getMessageIdValue());
+					var posts = getPostIdArray2();
+					if (posts[posts.length-1]> getLastPost2()) setLastPost2(posts[posts.length-1]);		
 				});
 				casper.then(function(){
 					this.echo("Wait 30s");
@@ -507,14 +511,14 @@ if (casper.cli.options.sync){
 		sqlite.queryArray("SELECT * FROM topicSync", "SQLITE3_ASSOC", function(result){
 			if (result.length){
 				casper.eachThen(result, function(response){
-					casper.eachThen([response.data],function(result){
-						topic = topic(response.data.topic1);
-						setTopic(topic);
+					casper.eachThen([response.data],function(response){
+						tpc = topic(response.data.topic1);
+						setTopic(tpc);
 					});
 					casper.then(function(){
-						topic = getTopic();
-						if (topic.getStored()){
-							topic.sync();
+						tpc = getTopic();
+						if (tpc.getStored()){
+							tpc.sync();
 						}
 					});
 				});
