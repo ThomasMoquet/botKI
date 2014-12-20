@@ -46,22 +46,21 @@ casper.then(function(){
 				}
 				return boitesPleines;
 			});
-			for (i=0;i < boitesPleines.length;i++) {
-				boite = boitesPleines[i];
-				this.echo(boite);
+			casper.eachThen(boitesPleines, function(response){
+				boite = response.data;
 				casper.open("http://www.kraland.org/" + boite);
 				casper.then(function(){
 					newKM = this.evaluate(function() {
 						newKM = new Array();
 						kms = document.querySelectorAll("#central-text .forum a.text-bold");
-						for (i=0;i < kms.length;i++) {
-							newKM[newKM.length] = kms[i].getAttribute('href');
+						for (j=0;j < kms.length;j++) {
+							newKM[newKM.length] = kms[j].getAttribute('href');
 						}
 						return newKM;
 
 					});
-					for (j=0;j < newKM.length;j++) {
-						km = newKM[j];
+					casper.eachThen(newKM, function(response){
+						km = response.data;
 						this.echo('Transfert http://www.kraland.org/' + km);
 						casper.open("http://www.kraland.org/" + km);
 						casper.thenOpen("http://www.kraland.org/" + km + "&p0=1", function(){
@@ -69,9 +68,10 @@ casper.then(function(){
 								p7 : "KraDesk [anim]"
 							}, true);
 						});
-					};
+
+					});
 				});
-			};
+			});
 		});
 	}
 	
